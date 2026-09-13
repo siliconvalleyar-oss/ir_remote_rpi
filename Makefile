@@ -68,9 +68,17 @@ CPPFLAGS += -DVERSION="\"$(VERSION)\"" -I$(INC_DIR) -I$(INC_DIR)/core -I$(INC_DI
 # Estándar C++17 y advertencias. sin -Werror para no romper el build.
 CXXFLAGS += -std=c++17 -Wall -Wextra -O2
 
-# Librerías necesarias: matemáticas (usada por los gráficos del OLED).
-# Nota: el acceso I2C se realiza por /dev/i2c-N (ioctl), sin depender de bcm2835.
-LIBS := -lm
+# Librerías necesarias:
+#   - bcm2835: acceso al hardware GPIO de la Raspberry Pi (se instala en
+#     /usr/local con scripts/install_deps.sh). Se enlaza con -lbcm2835.
+#   - m: matemáticas (usada por los gráficos del OLED).
+LIBS := -lbcm2835 -lm
+
+# Ruta donde se instala bcm2835 por defecto (install_deps.sh la deja en
+# /usr/local/lib). Se añade explícitamente aunque /usr/local/lib suele estar
+# en el path por defecto del enlazador.
+bcm2835_DIR := /usr/local
+LDFLAGS += -L$(bcm2835_DIR)/lib
 
 # --- Detección de arquitectura local para compilación cruzada automática ------
 # uname -m → aarch64 / armv7l / x86_64 / i686 / ...
